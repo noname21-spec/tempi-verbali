@@ -1,0 +1,735 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tempi Verbali</title>
+<meta name="description" content="I tempi verbali inglesi divisi per situazione d'uso, con flashcard e quiz.">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#F6F5F2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141413" media="(prefers-color-scheme: dark)">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Tempi Verbali">
+<link rel="preload" href="fonts/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/Poppins-Bold.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:Inter;font-weight:400;font-display:swap;src:url(fonts/Inter-Regular.woff2) format("woff2")}
+@font-face{font-family:Inter;font-weight:500;font-display:swap;src:url(fonts/Inter-Medium.woff2) format("woff2")}
+@font-face{font-family:Inter;font-weight:600 700;font-display:swap;src:url(fonts/Inter-SemiBold.woff2) format("woff2")}
+@font-face{font-family:Poppins;font-weight:500;font-display:swap;src:url(fonts/Poppins-Medium.woff2) format("woff2")}
+@font-face{font-family:Poppins;font-weight:600 700;font-display:swap;src:url(fonts/Poppins-Bold.woff2) format("woff2")}
+html,body{overscroll-behavior-y:none}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:calc(6px + env(safe-area-inset-top))!important}
+.install{flex:none;padding:8px 14px;border-radius:99px;background:var(--accent);color:#fff;font-weight:600;font-size:13px;display:none}
+.install.show{display:inline-flex;align-items:center;gap:6px}
+.sheet{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.45);display:none;align-items:flex-end;justify-content:center}
+.sheet.show{display:flex}
+.sheet .in{background:var(--surface);color:var(--ink);border-radius:22px 22px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom));max-width:680px;width:100%}
+.sheet h3{font-size:18px;margin-bottom:8px}
+.sheet ol{margin:0 0 14px;padding-left:20px;font-size:15px;line-height:1.7}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:12px;font-size:14px;z-index:40;display:none;align-items:center;gap:10px;box-shadow:var(--shadow);width:max-content;max-width:calc(100% - 32px)}
+.toast.show{display:flex}
+.toast button{color:var(--accent);font-weight:600;filter:brightness(1.4)}
+.reset{display:block;margin:14px auto 0;font-size:12.5px;color:var(--muted);text-decoration:underline}
+:root{
+  --bg:#F6F5F2; --surface:#FFFFFF; --surface-2:#F0EEE9; --ink:#1C1B19; --muted:#6E6A63; --line:#E4E1DA;
+  --accent:#4338CA; --good:#2F9E44; --bad:#E03131; --mid:#F08C00; --warn-bg:#FEF3C7; --warn-ink:#7C4A03;
+  --shadow:0 1px 2px rgba(0,0,0,.05),0 4px 14px rgba(0,0,0,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#141413; --surface:#1E1D1B; --surface-2:#262522; --ink:#F1EFEA; --muted:#A39E95; --line:#34322E;
+    --accent:#818CF8; --warn-bg:#3A2E12; --warn-ink:#F5D48A;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141413; --surface:#1E1D1B; --surface-2:#262522; --ink:#F1EFEA; --muted:#A39E95; --line:#34322E;
+  --accent:#818CF8; --warn-bg:#3A2E12; --warn-ink:#F5D48A;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+.wrap{max-width:680px;margin:0 auto;padding:16px 16px 110px}
+h1,h2,h3{font-family:Poppins,Inter,sans-serif;margin:0;line-height:1.2}
+header{padding:6px 0 14px}
+header h1{font-size:24px;letter-spacing:-.01em}
+header h1 span{color:var(--accent)}
+.sub{color:var(--muted);font-size:13px}
+.progress{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:14px;box-shadow:var(--shadow)}
+.progress .row{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:8px}
+.progress .row b{color:var(--ink);font-weight:600}
+.bar{height:8px;background:var(--surface-2);border-radius:99px;overflow:hidden;display:flex}
+.bar i{display:block;height:100%}
+.legend{display:flex;gap:12px;margin-top:8px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.legend span::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;background:var(--c)}
+
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);
+  display:flex;justify-content:center;padding:6px 8px calc(8px + env(safe-area-inset-bottom))}
+.tabs .in{display:flex;gap:4px;max-width:680px;width:100%}
+.tab{flex:1;padding:8px 4px;border-radius:12px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;color:var(--muted);font-weight:500}
+.tab svg{width:22px;height:22px}
+.tab.on{color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent)}
+
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:2px 16px 12px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:7px 12px;border-radius:99px;background:var(--surface);border:1px solid var(--line);font-size:13px;font-weight:500;white-space:nowrap}
+.chip.on{background:var(--c,var(--ink));border-color:var(--c,var(--ink));color:#fff}
+
+.group-head{border-radius:16px;padding:14px 16px;margin:20px 0 10px;background:var(--c);color:#fff;display:flex;gap:14px;align-items:center}
+.group-head .n{font-family:Poppins,sans-serif;font-weight:700;font-size:26px;line-height:1;opacity:.95}
+.group-head h2{font-size:17px}
+.group-head p{margin:2px 0 0;font-size:13px;opacity:.85}
+.group-head:first-child{margin-top:4px}
+
+.list{display:grid;gap:8px}
+.tense{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+.tense > button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:12px 14px}
+.tname{font-family:Poppins,sans-serif;font-weight:600;font-size:17px;color:var(--c)}
+.tit{font-size:13px;color:var(--muted)}
+.tdots{margin-left:auto;display:flex;gap:3px;flex:none}
+.tdots i{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.chev{width:18px;height:18px;color:var(--muted);transition:transform .2s;flex:none}
+.tense.open .chev{transform:rotate(180deg)}
+.tbody{display:none;padding:0 14px 14px}
+.tense.open .tbody{display:block}
+.form{background:var(--surface-2);border-radius:10px;padding:8px 11px;font-size:14px;margin-bottom:10px}
+.lbl{font-family:Poppins,sans-serif;font-size:10.5px;font-weight:600;letter-spacing:.07em;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:2px}
+.use{padding:9px 0;border-top:1px solid var(--line);display:flex;gap:10px;align-items:flex-start}
+.use:first-of-type{border-top:0}
+.use .d{font-weight:600;font-size:14px}
+.use .en{font-size:14.5px;margin-top:2px}
+.use .it{font-size:13.5px;color:var(--muted);font-style:italic}
+mark{background:none;color:var(--c,var(--accent));font-weight:600}
+.warn{background:var(--warn-bg);color:var(--warn-ink);border-radius:10px;padding:9px 11px;font-size:13.5px;margin-top:8px}
+.warn .lbl{color:var(--warn-ink)}
+.cmp{background:var(--surface);border:1px dashed color-mix(in srgb,var(--c) 55%,var(--line));border-radius:14px;padding:10px 14px;margin-top:8px}
+.cmp .row{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--line);font-size:14px}
+.cmp .row:first-of-type{border-top:0}
+.cmp .row span:last-child{color:var(--muted);text-align:right;font-size:13px}
+.say{width:34px;height:34px;border-radius:50%;display:inline-grid;place-items:center;background:var(--surface-2);flex:none}
+.say svg{width:17px;height:17px}
+.ok{color:var(--good);font-weight:700}.no{color:var(--bad);font-weight:700}
+
+details.how{margin-bottom:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px 14px}
+details.how summary{cursor:pointer;font-weight:600;font-size:14px;padding:8px 0;color:var(--accent);list-style:none}
+details.how summary::-webkit-details-marker{display:none}
+details.how[open]{padding-bottom:12px}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl td,.tbl th{padding:6px 6px;border-top:1px solid var(--line);text-align:left;vertical-align:top}
+.tbl th{font-family:Poppins,sans-serif;font-size:11px;color:var(--muted);font-weight:600;border-top:0}
+.tbl td:first-child{font-weight:600}
+.scroll{overflow-x:auto}
+
+/* flashcards */
+.fc-wrap{perspective:1200px;margin:6px 0 14px}
+.fc{position:relative;min-height:320px;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.2,.8,.2,1);cursor:pointer}
+.fc.flip{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:22px;padding:24px 20px;
+  background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px}
+.face.back{transform:rotateY(180deg);background:color-mix(in srgb,var(--c) 8%,var(--surface))}
+.face .big{font-family:Poppins,sans-serif;font-weight:700;font-size:26px;line-height:1.2}
+.face .big.c{color:var(--c)}
+.face .s{font-size:17px}
+.face .m{color:var(--muted);font-size:14px}
+.face .f{font-size:13.5px;background:var(--surface);border-radius:10px;padding:6px 10px;color:var(--ink)}
+.face .hint{position:absolute;bottom:14px;font-size:12px;color:var(--muted)}
+.tag{font-size:11.5px;font-weight:600;color:var(--c);text-transform:uppercase;letter-spacing:.06em}
+.rate{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.rate button{padding:14px 6px;border-radius:14px;font-weight:600;color:#fff;font-size:15px}
+.rate .r-no{background:var(--bad)} .rate .r-mid{background:var(--mid)} .rate .r-yes{background:var(--good)}
+.rate button small{display:block;font-weight:400;font-size:11px;opacity:.85}
+.rate[hidden]{display:none}
+.meta{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted);margin-bottom:6px;gap:8px}
+.seg{display:inline-flex;background:var(--surface-2);border-radius:10px;padding:3px}
+.seg button{padding:5px 10px;border-radius:8px;font-size:12px;font-weight:500;color:var(--muted);white-space:nowrap}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.primary{display:block;width:100%;padding:14px;border-radius:14px;background:var(--accent);color:#fff;font-weight:600;font-size:16px}
+.ghost{display:block;width:100%;padding:12px;border-radius:14px;border:1px solid var(--line);background:var(--surface);font-weight:500;margin-top:8px}
+.done{text-align:center;padding:30px 10px}
+.done .big{font-family:Poppins,sans-serif;font-size:44px;font-weight:700;color:var(--accent)}
+
+/* quiz */
+.q{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:var(--shadow)}
+.q .ask{font-size:13px;color:var(--muted);margin-bottom:6px}
+.q .prompt{font-family:Poppins,sans-serif;font-weight:600;font-size:20px;line-height:1.35}
+.q .prompt.sent{font-family:Inter,sans-serif;font-weight:500;font-size:18px}
+.q .blank{display:inline-block;min-width:70px;border-bottom:2px solid var(--accent);color:var(--accent);text-align:center}
+.q .base{color:var(--muted);font-weight:400}
+.opts{display:grid;gap:8px;margin-top:16px}
+.opt{padding:13px 14px;border-radius:13px;border:1.5px solid var(--line);background:var(--surface);text-align:left;font-weight:500;font-size:15px}
+.opt.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 14%,var(--surface))}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,var(--surface))}
+.opt:disabled{cursor:default}
+.feedback{margin-top:12px;font-size:14px;padding:10px 12px;border-radius:12px;background:var(--surface-2);display:none}
+.feedback.show{display:block}
+.qbar{height:5px;background:var(--surface-2);border-radius:9px;overflow:hidden;margin-bottom:12px}
+.qbar i{display:block;height:100%;background:var(--accent);transition:width .3s}
+.review{margin-top:14px;display:grid;gap:8px;text-align:left}
+.rcard{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:12px;padding:10px 12px;font-size:14px}
+.view[hidden]{display:none}
+.empty{color:var(--muted);text-align:center;padding:30px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Tempi <span>Verbali</span></h1>
+      <div class="sub">Divisi per quello che vuoi dire, non sulla linea del tempo</div>
+    </div>
+    <button class="install" id="install"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Installa</button>
+  </header>
+
+  <div class="progress" id="progress"></div>
+
+  <section class="view" id="v-learn">
+    <details class="how">
+      <summary>Come sceglierli in fretta ▾</summary>
+      <p style="margin:0 0 8px;font-size:14px"><b>La regola d'oro</b></p>
+      <div class="cmp" style="--c:var(--accent);margin:0 0 12px">
+        <div class="row"><span><b>Simple</b> = il fatto, l'abitudine, il tutto</span><span>I work · I worked</span></div>
+        <div class="row"><span><b>Continuous</b> (-ing) = azione in svolgimento, durata</span><span>I'm working · I was working</span></div>
+        <div class="row"><span><b>Perfect</b> (have + participio) = guardo indietro da un momento</span><span>I've worked · I had worked</span></div>
+      </div>
+      <p style="margin:0 0 6px;font-size:14px"><b>Le domande da farti</b></p>
+      <div class="scroll"><table class="tbl" id="questions"></table></div>
+    </details>
+    <div class="chips" id="learn-chips"></div>
+    <div id="learn-list"></div>
+    <details class="how" style="margin-top:18px">
+      <summary>Tabella delle forme (he / work) ▾</summary>
+      <div class="scroll"><table class="tbl" id="forms"></table></div>
+    </details>
+    <button class="reset" id="reset">Azzera i progressi</button>
+  </section>
+
+  <section class="view" id="v-cards" hidden>
+    <div class="chips" id="card-chips"></div>
+    <div id="card-area"></div>
+  </section>
+
+  <section class="view" id="v-quiz" hidden>
+    <div class="chips" id="quiz-chips"></div>
+    <div id="quiz-area"></div>
+  </section>
+</div>
+
+<nav class="tabs"><div class="in">
+  <button class="tab on" data-v="learn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M8 7h7M8 11h5"/></svg>Impara</button>
+  <button class="tab" data-v="cards"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="14" height="15" rx="2"/><path d="M7 3h12a2 2 0 0 1 2 2v12"/></svg>Flashcard</button>
+  <button class="tab" data-v="quiz"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14"/><circle cx="12" cy="17.5" r=".6" fill="currentColor"/></svg>Quiz</button>
+</div></nav>
+
+<script>
+/* ================= DATI =================
+   Ogni situazione contiene dei tempi; ogni tempo ha forma, usi (con esempio), "occhio" e confronti.
+   Negli esempi le parti tra [ ] vengono evidenziate. */
+const GROUPS = [
+ {k:"Abitudini e verità", n:"1", title:"Abitudini, routine e verità generali", desc:"Cose che si ripetono, sempre vere o stabili", c:"#0F766E", t:[
+  {id:"ps", name:"Present Simple", it:"presente semplice",
+   form:"I/you/we/they <b>work</b> · he/she/it <b>works</b> · <b>don't/doesn't</b> + verbo · <b>Do/Does</b> … + verbo?",
+   uses:[
+    ["Abitudini e routine (every day, usually, often)","I usually [get up] at seven.","Di solito mi alzo alle sette."],
+    ["Verità generali e fatti scientifici","Water [boils] at 100 °C.","L'acqua bolle a 100 °C."],
+    ["Situazioni permanenti: dove vivi, che lavoro fai","She [lives] in Bologna and [works] in a shop.","Vive a Bologna e lavora in un negozio."],
+    ["Verbi di stato (know, like, want), anche quando parli di adesso","I [don't understand] this word.","Non capisco questa parola."]],
+   warn:"Non dimenticare la <b>-s</b> alla terza persona: <i>he works, she goes</i>. Con negative e domande la -s passa su <i>does</i>: <i>She doesn't work</i> <span class='ok'>✓</span> <i>She doesn't works</i> <span class='no'>✗</span>"}
+ ]},
+ {k:"In corso adesso", n:"2", title:"Cose in corso adesso o temporanee", desc:"Azioni in svolgimento, situazioni provvisorie, cambiamenti", c:"#1D4ED8", t:[
+  {id:"pc", name:"Present Continuous", it:"presente progressivo",
+   form:"<b>am/is/are</b> + verbo<b>-ing</b> · <b>isn't/aren't</b> + -ing · <b>Is/Are</b> … -ing?",
+   uses:[
+    ["Azione in corso mentre parli (now, at the moment, Look!)","I'm [studying] right now, can I call you later?","Sto studiando, ti richiamo dopo?"],
+    ["Situazione temporanea (this week, these days)","He's [staying] with friends this month.","Questo mese sta da amici."],
+    ["Cambiamento in atto","Prices [are going up].","I prezzi stanno salendo."],
+    ["Lamentela con always: un'abitudine fastidiosa","You're always [interrupting] me!","Mi interrompi sempre!"]],
+   warn:"Se l'azione è in corso adesso, il -ing è <b>obbligatorio</b>. <i>What are you doing?</i> = Che fai adesso? · <i>What do you do?</i> = Che lavoro fai?<br>I verbi di stato di solito non vanno al -ing: <i>I know</i> <span class='ok'>✓</span> <i>I'm knowing</i> <span class='no'>✗</span>"}
+ ], cmp:{title:"Simple o Continuous?", rows:[["I [live] in Bologna.","permanente"],["I'm [living] in London this semester.","temporaneo"],["He [plays] football.","abitudine"],["He's [playing] football.","in questo momento"]]}},
+ {k:"Raccontare il passato", n:"3", title:"Raccontare il passato", desc:"Fatti conclusi, storie, cosa è successo e in che ordine", c:"#6D28D9", t:[
+  {id:"pas", name:"Past Simple", it:"passato semplice",
+   form:"verbo + <b>-ed</b> / forma irregolare (<i>went, saw</i>) · <b>didn't</b> + verbo · <b>Did</b> … + verbo?",
+   uses:[
+    ["Azione finita in un momento preciso del passato (yesterday, last year, ago)","I [went] to Paris last summer.","Sono andato a Parigi l'estate scorsa."],
+    ["Una sequenza di azioni in un racconto","We [got up], [had] breakfast and [left].","Ci siamo alzati, abbiamo fatto colazione e siamo usciti."],
+    ["Domande su quando è successo qualcosa","When [did] you [arrive]?","Quando sei arrivato?"]],
+   warn:"Con un momento passato preciso serve il Past Simple, mai il Present Perfect: <i>I saw him yesterday</i> <span class='ok'>✓</span> <i>I have seen him yesterday</i> <span class='no'>✗</span>"},
+  {id:"pac", name:"Past Continuous", it:"passato progressivo",
+   form:"<b>was/were</b> + verbo<b>-ing</b> · <b>wasn't/weren't</b> + -ing · <b>Was/Were</b> … -ing?",
+   uses:[
+    ["Azione in corso in un momento del passato","At 9 last night I [was watching] a film.","Ieri alle 9 stavo guardando un film."],
+    ["Lo sfondo, interrotto da un'azione breve (when)","I [was walking] home when it started to rain.","Tornavo a casa quando ha iniziato a piovere."],
+    ["Due azioni in corso nello stesso momento (while)","While she [was cooking], he [was setting] the table.","Mentre lei cucinava, lui apparecchiava."]],
+   warn:"È l'imperfetto di un'azione <b>in corso</b>, non di un'abitudine: <i>Da bambino giocavo a calcio</i> = <i>I used to play football</i> <span class='ok'>✓</span> <i>I was playing</i> <span class='no'>✗</span>"},
+  {id:"pap", name:"Past Perfect", it:"trapassato prossimo",
+   form:"<b>had</b> + participio · <b>hadn't</b> + participio · <b>Had</b> … + participio?",
+   uses:[
+    ["Azione avvenuta prima di un altro momento passato","When I arrived, the train [had] already [left].","Quando sono arrivato, il treno era già partito."],
+    ["Spiegare la causa di qualcosa in un racconto","I couldn't get in because I [had lost] my keys.","Non riuscivo a entrare perché avevo perso le chiavi."],
+    ["Discorso indiretto (he said he had…)","He said he [had never been] to Rome.","Ha detto che non era mai stato a Roma."]]},
+  {id:"papc", name:"Past Perfect Continuous", it:"trapassato progressivo",
+   form:"<b>had been</b> + verbo<b>-ing</b>",
+   uses:[
+    ["Durata di un'azione fino a un momento passato","I [had been waiting] for an hour when the bus came.","Aspettavo da un'ora quando è arrivato l'autobus."],
+    ["Causa visibile di uno stato passato","Her eyes were red: she [had been crying].","Aveva gli occhi rossi: aveva pianto."]]}
+ ], cmp:{title:"Una frase, tre tempi", rows:[["I [was walking] through the station…","sfondo"],["…when I [realised]…","evento"],["…that I [had left] my passport at home.","ancora prima"]]}},
+ {k:"Passato + presente", n:"4", title:"Il passato che tocca il presente", desc:"Esperienze, risultati, cose iniziate prima e ancora vere", c:"#BE123C", t:[
+  {id:"pp", name:"Present Perfect", it:"nessun equivalente diretto",
+   form:"<b>have/has</b> + participio · <b>haven't/hasn't</b> + participio · <b>Have/Has</b> … + participio?",
+   uses:[
+    ["Esperienze nella vita, senza dire quando (ever, never)","Have you ever [been] to London?","Sei mai stato a Londra?"],
+    ["Azione passata con un risultato visibile adesso","I've [lost] my phone.","Ho perso il telefono (e non lo trovo)."],
+    ["Azioni recenti (just, already, yet)","She has just [left].","È appena uscita."],
+    ["Periodo non ancora concluso (today, this week)","I've [drunk] three coffees today.","Oggi ho bevuto tre caffè."],
+    ["Stato iniziato nel passato e ancora vero (for, since)","I've [known] him for ten years.","Lo conosco da dieci anni."]],
+   warn:"<b>Da + tempo</b> con qualcosa ancora vero: italiano = presente, inglese = Present Perfect. <i>I've lived here for three years</i> <span class='ok'>✓</span> <i>I live here since three years</i> <span class='no'>✗</span><br><b>for</b> = durata (for two hours) · <b>since</b> = punto di partenza (since 2020)"},
+  {id:"ppc", name:"Present Perfect Continuous", it:"nessun equivalente diretto",
+   form:"<b>have/has been</b> + verbo<b>-ing</b> · <b>How long have you been</b> … -ing?",
+   uses:[
+    ["Azione iniziata nel passato e ancora in corso, accento sulla durata","I've [been studying] English for two years.","Studio inglese da due anni."],
+    ["Attività appena finita con effetti visibili","You look tired. [Have] you [been running]?","Sembri stanco. Hai corso?"]],
+   warn:"Durata → continuous: <i>I've been reading all day</i>. Risultato o quantità → simple: <i>I've read three chapters</i>."}
+ ], cmp:{title:"Past Simple o Present Perfect?", rows:[["I [went] to London in 2023.","momento preciso, chiuso"],["I've [been] to London.","esperienza, non dico quando"],["I've [lost] my keys.","conta adesso: non le ho"]]}},
+ {k:"Abitudini passate", n:"5", title:"Abitudini del passato", desc:"Cose che facevi o che erano vere, e ora non più", c:"#B45309", t:[
+  {id:"used", name:"used to", it:"imperfetto di abitudine",
+   form:"<b>used to</b> + verbo · <b>didn't use to</b> + verbo · <b>Did</b> you <b>use to</b> …?",
+   uses:[
+    ["Abitudine passata che non esiste più","I [used to smoke], but I stopped.","Fumavo, ma ho smesso."],
+    ["Stato passato che non è più vero","There [used to be] a cinema here.","Qui c'era un cinema."]],
+   warn:"Non confonderlo con <b>be/get used to + -ing</b> (essere/abituarsi a): <i>I'm used to getting up early</i> = Sono abituato ad alzarmi presto."},
+  {id:"would", name:"would (passato)", it:"imperfetto narrativo",
+   form:"<b>would</b> ('d) + verbo base",
+   uses:[
+    ["Azioni ripetute nei ricordi e nei racconti (solo azioni, non stati)","Every summer we [would go] to the seaside.","Ogni estate andavamo al mare."]],
+   warn:"Con gli stati serve <i>used to</i>: <i>I used to live in Rome</i> <span class='ok'>✓</span> <i>I would live in Rome</i> <span class='no'>✗</span>"}
+ ]},
+ {k:"Futuro", n:"6", title:"Parlare del futuro", desc:"La forma dipende da quanto è deciso, certo o organizzato", c:"#15803D", t:[
+  {id:"will", name:"will", it:"futuro semplice",
+   form:"<b>will</b> ('ll) + verbo · <b>won't</b> + verbo · <b>Will</b> … + verbo?",
+   uses:[
+    ["Decisione presa sul momento","The phone's ringing. — I'[ll get] it.","Squilla il telefono. — Rispondo io."],
+    ["Previsione o opinione (I think, probably, I'm sure)","I think it [will rain] tomorrow.","Penso che domani pioverà."],
+    ["Promessa, offerta, richiesta","I [won't tell] anyone, I promise.","Non lo dirò a nessuno, promesso."]]},
+  {id:"going", name:"be going to", it:"ho intenzione di / sta per",
+   form:"<b>am/is/are going to</b> + verbo",
+   uses:[
+    ["Intenzione già decisa prima di parlarne","I'm [going to look] for a new job.","Ho intenzione di cercare un nuovo lavoro."],
+    ["Previsione basata su qualcosa che vedi adesso","Look at those clouds: it's [going to rain].","Guarda quelle nuvole: sta per piovere."]]},
+  {id:"pcf", name:"Present Continuous (futuro)", it:"programma organizzato",
+   form:"<b>am/is/are</b> + -ing + quando",
+   uses:[
+    ["Appuntamento o programma già organizzato","I'm [meeting] Sara at six.","Vedo Sara alle sei."]]},
+  {id:"psf", name:"Present Simple (futuro)", it:"orari e frasi temporali",
+   form:"verbo al presente",
+   uses:[
+    ["Orari e calendari ufficiali (treni, voli, lezioni)","The train [leaves] at 8:15.","Il treno parte alle 8:15."],
+    ["Dopo when, as soon as, until, if riferiti al futuro","I'll call you when I [arrive].","Ti chiamo quando arrivo."]],
+   warn:"Dopo <i>when, as soon as, until, before, after, if</i> si usa il presente, anche se in italiano diciamo il futuro: <i>when I arrive</i> <span class='ok'>✓</span> <i>when I will arrive</i> <span class='no'>✗</span>"},
+  {id:"fc", name:"Future Continuous", it:"futuro progressivo",
+   form:"<b>will be</b> + verbo<b>-ing</b>",
+   uses:[
+    ["Azione che sarà in corso in un momento futuro","This time tomorrow I'[ll be lying] on the beach.","Domani a quest'ora sarò sdraiato in spiaggia."],
+    ["Domanda cortese sui piani di qualcuno","[Will] you [be using] the car tonight?","Ti serve la macchina stasera?"]]},
+  {id:"fp", name:"Future Perfect", it:"futuro anteriore",
+   form:"<b>will have</b> + participio",
+   uses:[
+    ["Azione completata entro un momento futuro (by)","By June I'[ll have finished] my exams.","Entro giugno avrò finito gli esami."]]},
+  {id:"fpc", name:"Future Perfect Continuous", it:"durata fino a un momento futuro",
+   form:"<b>will have been</b> + verbo<b>-ing</b>",
+   uses:[
+    ["Durata di un'azione fino a un momento futuro","In May I'[ll have been living] here for five years.","A maggio saranno cinque anni che vivo qui."]]}
+ ], cmp:{title:"Stesso piano, tre sfumature", rows:[["OK, I'[ll go] to the gym.","ho appena deciso"],["I'm [going to go] to the gym more often.","intenzione"],["I'm [going] to the gym with Luca at 7.","organizzato"]]}},
+ {k:"Ipotesi e desideri", n:"7", title:"Ipotesi, condizioni e desideri", desc:"Più è irreale, più il verbo \"torna indietro\" nel passato", c:"#4338CA", t:[
+  {id:"c0", name:"Zero conditional", it:"if + present, present",
+   form:"<b>If</b> + present, present",
+   uses:[["Regola o fatto sempre vero","If you [heat] ice, it [melts].","Se scaldi il ghiaccio, si scioglie."]]},
+  {id:"c1", name:"First conditional", it:"if + present, will",
+   form:"<b>If</b> + present, <b>will</b> + verbo",
+   uses:[["Condizione possibile, reale nel futuro","If it [rains], we'[ll stay] at home.","Se piove, restiamo a casa."]],
+   warn:"Mai <i>will</i> dopo <i>if</i>: <i>If it rains</i> <span class='ok'>✓</span> <i>If it will rain</i> <span class='no'>✗</span>"},
+  {id:"c2", name:"Second conditional", it:"if + past, would",
+   form:"<b>If</b> + past, <b>would</b> + verbo",
+   uses:[
+    ["Ipotesi irreale o improbabile nel presente/futuro","If I [had] more time, I'[d travel] more.","Se avessi più tempo, viaggerei di più."],
+    ["Dare un consiglio (If I were you…)","If I [were] you, I'[d accept] the offer.","Se fossi in te, accetterei l'offerta."]],
+   warn:"Mai <i>would</i> nella parte con <i>if</i>: <i>If I had time</i> <span class='ok'>✓</span> <i>If I would have time</i> <span class='no'>✗</span>"},
+  {id:"c3", name:"Third conditional", it:"if + past perfect, would have",
+   form:"<b>If</b> + past perfect, <b>would have</b> + participio",
+   uses:[["Ipotesi irreale nel passato, rimpianti","If I [had studied], I [would have passed].","Se avessi studiato, sarei stato promosso."]]},
+  {id:"cm", name:"Mixed conditional", it:"passato irreale, effetto sul presente",
+   form:"<b>If</b> + past perfect, <b>would</b> + verbo",
+   uses:[["Un passato diverso che cambierebbe il presente","If I [had taken] that job, I'[d live] in London now.","Se avessi accettato quel lavoro, ora vivrei a Londra."]]},
+  {id:"wish", name:"I wish / If only", it:"vorrei che…, magari…",
+   form:"<b>wish</b> + past · <b>wish</b> + past perfect · <b>wish</b> + would",
+   uses:[
+    ["Desiderio su una situazione presente diversa dalla realtà","I wish I [lived] by the sea.","Vorrei vivere al mare."],
+    ["Rimpianto per qualcosa di passato","I wish I [had told] her the truth.","Vorrei averle detto la verità."],
+    ["Fastidio per il comportamento di qualcuno","I wish you [would stop] shouting.","Vorrei che smettessi di urlare."]]}
+ ]}
+];
+
+/* Esercizi a completamento: [frase con ___, verbo base, giusta, sbagliate x3, id tempo] */
+const GAPS = [
+ ["Water ___ at 100 °C.","boil","boils",["is boiling","boiled","has boiled"],"ps"],
+ ["I usually ___ at seven.","get up","get up",["am getting up","got up","have got up"],"ps"],
+ ["___ jazz?","you / like","Do you like",["Are you liking","Have you liked","Does you like"],"ps"],
+ ["She ___ meat — she's vegetarian.","not / eat","doesn't eat",["isn't eating","didn't eat","don't eat"],"ps"],
+ ["Shh! The baby ___.","sleep","is sleeping",["sleeps","slept","has slept"],"pc"],
+ ["I ___ with my cousin this week, until I find a flat.","stay","am staying",["stay","stayed","have stayed"],"pc"],
+ ["What ___ right now?","you / do","are you doing",["do you do","did you do","have you done"],"pc"],
+ ["I ___ him yesterday at the station.","see","saw",["have seen","was seeing","had seen"],"pas"],
+ ["We ___ to Bologna in 2019.","move","moved",["have moved","were moving","had moved"],"pas"],
+ ["When ___?","you / arrive","did you arrive",["have you arrived","were you arriving","had you arrived"],"pas"],
+ ["I ___ home when it started to rain.","walk","was walking",["walked","have walked","had walked"],"pac"],
+ ["When you called, we ___ dinner, so I didn't answer.","have","were having",["had","have had","are having"],"pac"],
+ ["While she ___, he was setting the table.","cook","was cooking",["cooked","has cooked","had cooked"],"pac"],
+ ["When we got to the cinema, the film ___.","already / start","had already started",["has already started","already starts","was already starting"],"pap"],
+ ["I couldn't get in because I ___ my keys earlier that day.","lose","had lost",["have lost","was losing","lose"],"pap"],
+ ["He told me he ___ to Rome before.","never / be","had never been",["has never been","never is","was never being"],"pap"],
+ ["I ___ for an hour when the bus finally came.","wait","had been waiting",["have been waiting","am waiting","wait"],"papc"],
+ ["Her eyes were red: she ___.","cry","had been crying",["has been crying","cries","is crying"],"papc"],
+ ["___ to London?","you / ever / be","Have you ever been",["Do you ever go","Were you ever being","Had you ever been"],"pp"],
+ ["I ___ my phone. Can you call it?","lose","have lost",["lose","had lost","am losing"],"pp"],
+ ["I ___ him for ten years.","know","have known",["know","knew","am knowing"],"pp"],
+ ["She ___. You've just missed her!","just / leave","has just left",["just leaves","had just left","is just leaving"],"pp"],
+ ["I ___ three coffees today, and it's only 10 am.","drink","have drunk",["drank","drink","had drunk"],"pp"],
+ ["I ___ English for two years and I still find it hard.","study","have been studying",["study","am studying","studied"],"ppc"],
+ ["You look exhausted. ___?","you / run","Have you been running",["Are you running","Do you run","Had you been running"],"ppc"],
+ ["How long ___? I'm so sorry I'm late!","you / wait","have you been waiting",["are you waiting","do you wait","had you waited"],"ppc"],
+ ["I ___, but I quit five years ago.","smoke","used to smoke",["would smoke","am smoking","have smoked"],"used"],
+ ["There ___ a cinema here, but now it's a supermarket.","be","used to be",["would be","has been","is being"],"used"],
+ ["As a child I ___ football every weekend.","play","used to play",["was playing","have played","am playing"],"used"],
+ ["Every summer we ___ to the seaside — I loved it.","go","would go",["will go","have gone","are going"],"would"],
+ ["\"The phone's ringing.\" \"I ___ it!\"","get","'ll get",["'m going to get","get","'m getting"],"will"],
+ ["I think it ___ tomorrow.","rain","will rain",["is raining","rains","rained"],"will"],
+ ["Don't worry, I ___ anyone. I promise.","not / tell","won't tell",["don't tell","didn't tell","wasn't telling"],"will"],
+ ["Look at those dark clouds! It ___.","rain","is going to rain",["rains","rained","has rained"],"going"],
+ ["I've decided: I ___ for a new job.","look","am going to look",["look","looked","have looked"],"going"],
+ ["I ___ Sara at six — we've booked a table.","meet","am meeting",["meet","met","have met"],"pcf"],
+ ["According to the timetable, the train ___ at 8:15.","leave","leaves",["left","has left","had left"],"psf"],
+ ["I'll call you as soon as I ___.","arrive","arrive",["will arrive","arrived","would arrive"],"psf"],
+ ["This time tomorrow I ___ to Barcelona.","fly","will be flying",["fly","have flown","flew"],"fc"],
+ ["By June I ___ all my exams.","finish","will have finished",["finish","am finishing","finished"],"fp"],
+ ["In May I ___ here for five years.","live","will have been living",["will live","am living","live"],"fpc"],
+ ["If you heat ice, it ___.","melt","melts",["would melt","melted","has melted"],"c0"],
+ ["If it ___ tomorrow, we'll stay at home.","rain","rains",["will rain","rained","would rain"],"c1"],
+ ["If I ___ more time, I would travel more.","have","had",["have","would have","will have"],"c2"],
+ ["If I ___ you, I'd accept the offer.","be","were",["am","would be","will be"],"c2"],
+ ["If I had studied, I ___ the exam.","pass","would have passed",["would pass","had passed","will pass"],"c3"],
+ ["If I ___ that job, I'd live in London now.","take","had taken",["took","would take","have taken"],"cm"],
+ ["I wish I ___ by the sea.","live","lived",["live","will live","am living"],"wish"],
+ ["I wish I ___ her the truth — now it's too late.","tell","had told",["tell","will tell","have told"],"wish"],
+ ["I wish you ___ shouting!","stop","would stop",["stop","will stop","are stopping"],"wish"]
+];
+
+const QUESTIONS = [
+ ["È un'abitudine, una verità, una situazione stabile?","Present Simple"],
+ ["Sta succedendo adesso o è temporaneo?","Present Continuous"],
+ ["È finito e so (o dico) quando?","Past Simple"],
+ ["Conta adesso, non dico quando, o è ancora vero?","Present Perfect"],
+ ["Era in corso in quel momento del passato?","Past Continuous"],
+ ["È successo prima di un altro fatto passato?","Past Perfect"],
+ ["Lo decido adesso / è una previsione?","will"],
+ ["L'avevo già deciso / lo vedo arrivare?","going to"],
+ ["È in agenda, con orario o persone coinvolte?","Present Continuous"],
+ ["È un'ipotesi irreale?","past / past perfect + would"]
+];
+const FORMS = [
+ ["Present Simple","works","doesn't work","Does he work?"],
+ ["Present Continuous","is working","isn't working","Is he working?"],
+ ["Present Perfect","has worked","hasn't worked","Has he worked?"],
+ ["Pres. Perfect Cont.","has been working","hasn't been working","Has he been working?"],
+ ["Past Simple","worked","didn't work","Did he work?"],
+ ["Past Continuous","was working","wasn't working","Was he working?"],
+ ["Past Perfect","had worked","hadn't worked","Had he worked?"],
+ ["Past Perfect Cont.","had been working","hadn't been working","Had he been working?"],
+ ["will","will work","won't work","Will he work?"],
+ ["going to","is going to work","isn't going to work","Is he going to work?"],
+ ["Future Continuous","will be working","won't be working","Will he be working?"],
+ ["Future Perfect","will have worked","won't have worked","Will he have worked?"]
+];
+
+/* ================= MODELLO ================= */
+const TENSES={}, USES=[];
+GROUPS.forEach((g,gi)=>g.t.forEach(t=>{
+  t.g=gi; t.c=g.c; TENSES[t.id]=t;
+  t.uses.forEach((u,ui)=>USES.push({id:t.id+"#"+ui, t, g:gi, c:g.c, desc:u[0], en:u[1], itex:u[2]}));
+}));
+
+const KEY="tempi-progress-v1";
+let prog={};
+try{ prog=JSON.parse(localStorage.getItem(KEY)||"{}")||{}; }catch(e){ prog={}; }
+const save=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(prog)); }catch(e){} };
+const box=u=>prog[u.id]||0;
+function setBox(u,b){ prog[u.id]=Math.max(0,Math.min(5,b)); save(); renderProgress(); }
+function bumpTense(id,ok){ USES.filter(u=>u.t.id===id).forEach(u=>{ prog[u.id]=Math.max(0,Math.min(5,box(u)+(ok?1:-1))); }); save(); renderProgress(); }
+
+/* ================= UTILITÀ ================= */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+const mark=s=>esc(s).replace(/\[(.+?)\]/g,"<mark>$1</mark>");
+const plain=s=>s.replace(/[\[\]]/g,"");
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;};
+const dotColor=b=>b>=3?"var(--good)":b>=1?"var(--mid)":"var(--line)";
+const SPK=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>`;
+const CHEV=`<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>`;
+
+let voice=null;
+function pickVoice(){ if(!("speechSynthesis" in window)) return; const vs=speechSynthesis.getVoices();
+  voice=vs.find(v=>/en[-_]GB/i.test(v.lang))||vs.find(v=>/^en/i.test(v.lang))||null; }
+if("speechSynthesis" in window){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
+function speak(text){ if(!("speechSynthesis" in window)) return; speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text); u.lang=voice?voice.lang:"en-GB"; if(voice) u.voice=voice; u.rate=.92; speechSynthesis.speak(u); }
+
+/* ================= FILTRO SITUAZIONI ================= */
+let filterG=-1, view="learn";
+function chipsHtml(){
+  return `<button class="chip ${filterG===-1?"on":""}" data-g="-1">Tutte</button>`+
+    GROUPS.map((g,i)=>`<button class="chip ${filterG===i?"on":""}" data-g="${i}" style="--c:${g.c}">${g.n} · ${esc(g.k)}</button>`).join("");
+}
+function renderChips(){ ["#learn-chips","#card-chips","#quiz-chips"].forEach(id=>$(id).innerHTML=chipsHtml()); }
+document.addEventListener("click",e=>{
+  const ch=e.target.closest(".chip[data-g]"); if(!ch) return;
+  filterG=+ch.dataset.g; renderChips();
+  if(view==="learn") renderLearn(); else if(view==="cards") startCards(); else startQuiz();
+});
+const inFilter=g=>filterG<0||g===filterG;
+
+/* ================= PROGRESSO ================= */
+function renderProgress(){
+  const n=USES.length, learned=USES.filter(u=>box(u)>=3).length, going=USES.filter(u=>box(u)>=1&&box(u)<3).length;
+  $("#progress").innerHTML=`
+    <div class="row"><span>Il tuo progresso</span><span><b>${learned}</b> / ${n} usi imparati</span></div>
+    <div class="bar"><i style="width:${learned/n*100}%;background:var(--good)"></i><i style="width:${going/n*100}%;background:var(--mid)"></i></div>
+    <div class="legend"><span style="--c:var(--good)">Imparati</span><span style="--c:var(--mid)">In corso</span><span style="--c:var(--line)">Da vedere</span></div>`;
+}
+
+/* ================= IMPARA ================= */
+const openSet=new Set();
+function renderLearn(){
+  let html="";
+  GROUPS.forEach((g,gi)=>{
+    if(!inFilter(gi)) return;
+    html+=`<div class="group-head" style="--c:${g.c}"><div class="n">${g.n}</div><div><h2>${esc(g.title)}</h2><p>${esc(g.desc)}</p></div></div><div class="list">`;
+    g.t.forEach(t=>{
+      const us=USES.filter(u=>u.t===t);
+      html+=`<div class="tense ${openSet.has(t.id)?"open":""}" data-t="${t.id}" style="--c:${g.c}">
+        <button class="thead"><div><div class="tname">${esc(t.name)}</div><div class="tit">${esc(t.it)}</div></div>
+          <span class="tdots">${us.map(u=>`<i style="background:${dotColor(box(u))}"></i>`).join("")}</span>${CHEV}</button>
+        <div class="tbody">
+          <div class="form"><span class="lbl">Forma</span>${t.form}</div>
+          <span class="lbl">Quando lo usi</span>
+          ${us.map(u=>`<div class="use"><div style="flex:1"><div class="d">${esc(u.desc)}</div>
+            <div class="en">${mark(u.en)}</div><div class="it">${esc(u.itex)}</div></div>
+            <button class="say" data-say="${esc(plain(u.en))}" aria-label="Ascolta">${SPK}</button></div>`).join("")}
+          ${t.warn?`<div class="warn"><span class="lbl">Occhio</span>${t.warn}</div>`:""}
+        </div></div>`;
+    });
+    html+=`</div>`;
+    if(g.cmp) html+=`<div class="cmp" style="--c:${g.c}"><span class="lbl" style="color:${g.c}">${esc(g.cmp.title)}</span>
+      ${g.cmp.rows.map(r=>`<div class="row"><span>${mark(r[0])}</span><span>${esc(r[1])}</span></div>`).join("")}</div>`;
+  });
+  $("#learn-list").innerHTML=html;
+}
+$("#learn-list").addEventListener("click",e=>{
+  const s=e.target.closest(".say"); if(s){ speak(s.dataset.say); return; }
+  const h=e.target.closest(".thead"); if(h){ const card=h.parentElement, id=card.dataset.t;
+    card.classList.toggle("open"); card.classList.contains("open")?openSet.add(id):openSet.delete(id); }
+});
+$("#questions").innerHTML=`<tr><th>Domanda</th><th>Tempo</th></tr>`+QUESTIONS.map(q=>`<tr><td style="font-weight:400">${esc(q[0])}</td><td><b>${esc(q[1])}</b></td></tr>`).join("");
+$("#forms").innerHTML=`<tr><th>Tempo</th><th>+</th><th>−</th><th>?</th></tr>`+FORMS.map(f=>`<tr>${f.map(x=>`<td>${esc(x)}</td>`).join("")}</tr>`).join("");
+
+/* ================= FLASHCARD ================= */
+let deck=[], cur=null, dir="use", stats={yes:0}, total=0;
+const SESSION=15;
+function startCards(){
+  const p=USES.filter(u=>inFilter(u.g));
+  const by={}; p.forEach(u=>(by[box(u)]=by[box(u)]||[]).push(u));
+  deck=Object.keys(by).sort((a,b)=>a-b).flatMap(k=>shuffle(by[k])).slice(0,SESSION);
+  stats={yes:0}; total=deck.length; nextCard();
+}
+function nextCard(){
+  cur=deck.shift();
+  if(!cur) return cardsDone();
+  const g=GROUPS[cur.g], t=cur.t;
+  const front = dir==="use"
+    ? `<span class="tag">${esc(g.k)}</span><div class="m">Che tempo usi per…</div><div class="big" style="font-size:22px">${esc(cur.desc)}</div>`
+    : `<span class="tag">Che tempo è? Perché?</span><div class="s">${mark(cur.en)}</div>`;
+  const back = dir==="use"
+    ? `<div class="big c">${esc(t.name)}</div><div class="f">${t.form}</div><div class="s">${mark(cur.en)}</div><div class="m">${esc(cur.itex)}</div>`
+    : `<div class="big c">${esc(t.name)}</div><div class="s" style="font-size:15px"><b>${esc(cur.desc)}</b></div><div class="m">${esc(cur.itex)}</div>`;
+  $("#card-area").innerHTML=`
+    <div class="meta"><span>${stats.yes+1} di ${total}</span>
+      <div class="seg"><button data-dir="use" class="${dir==="use"?"on":""}">Uso → Tempo</button><button data-dir="sent" class="${dir==="sent"?"on":""}">Frase → Tempo</button></div></div>
+    <div class="fc-wrap"><div class="fc" id="fc" style="--c:${cur.c}">
+      <div class="face front">${front}<div class="hint">tocca per girare</div></div>
+      <div class="face back">${back}<button class="say" data-say="${esc(plain(cur.en))}" aria-label="Ascolta">${SPK}</button></div>
+    </div></div>
+    <div class="rate" id="rate" hidden>
+      <button class="r-no" data-r="no">Non lo so<small>torna presto</small></button>
+      <button class="r-mid" data-r="mid">Quasi<small>ripasso</small></button>
+      <button class="r-yes" data-r="yes">Lo so<small>avanti</small></button>
+    </div>
+    <button class="ghost" id="reveal">Mostra risposta</button>`;
+  if(dir==="sent") speak(plain(cur.en));
+}
+function flip(){ const fc=$("#fc"); if(!fc||fc.classList.contains("flip")) return;
+  fc.classList.add("flip"); $("#rate").hidden=false; $("#reveal").style.display="none"; if(dir==="use") speak(plain(cur.en)); }
+$("#card-area").addEventListener("click",e=>{
+  const s=e.target.closest(".say"); if(s){ e.stopPropagation(); speak(s.dataset.say); return; }
+  const d=e.target.closest("[data-dir]"); if(d){ dir=d.dataset.dir; deck.unshift(cur); nextCard(); return; }
+  if(e.target.closest("#fc")||e.target.closest("#reveal")){ flip(); return; }
+  const r=e.target.closest("[data-r]"); if(r){
+    const k=r.dataset.r;
+    if(k==="yes"){ setBox(cur,box(cur)+1); stats.yes++; }
+    else if(k==="mid"){ setBox(cur,Math.min(box(cur),2)); deck.splice(Math.min(5,deck.length),0,cur); }
+    else { setBox(cur,0); deck.splice(Math.min(3,deck.length),0,cur); }
+    nextCard(); return;
+  }
+  if(e.target.closest("#again")) startCards();
+});
+function cardsDone(){
+  $("#card-area").innerHTML=`<div class="done"><div class="big">Fatto!</div>
+    <p>Hai ripassato <b>${stats.yes}</b> usi. Quelli sbagliati sono tornati finché non li hai saputi.</p>
+    <button class="primary" id="again">Nuova sessione</button></div>`;
+}
+
+/* ================= QUIZ ================= */
+let quiz=[], qi=0, score=0, wrongs=[];
+function tenseDistractors(t){
+  const others=Object.values(TENSES).filter(o=>o.id!==t.id);
+  const same=shuffle(others.filter(o=>o.g===t.g));
+  const rest=shuffle(others.filter(o=>o.g!==t.g));
+  return [...same.slice(0,2),...rest].slice(0,3);
+}
+function startQuiz(){
+  const gaps=shuffle(GAPS.filter(x=>inFilter(TENSES[x[4]].g)));
+  const uses=shuffle(USES.filter(u=>inFilter(u.g)));
+  const qs=[];
+  // 6 completamenti, 2 "che tempo è", 2 "che tempo usi per…"
+  gaps.slice(0,6).forEach(x=>qs.push({type:"gap",x,t:TENSES[x[4]],opts:shuffle([x[2],...x[3]])}));
+  uses.slice(0,2).forEach(u=>qs.push({type:"which",u,t:u.t,opts:shuffle([u.t,...tenseDistractors(u.t)])}));
+  uses.slice(2,4).forEach(u=>qs.push({type:"use",u,t:u.t,opts:shuffle([u.t,...tenseDistractors(u.t)])}));
+  while(qs.length<10 && gaps.length>qs.filter(q=>q.type==="gap").length){
+    const x=gaps[qs.filter(q=>q.type==="gap").length]; qs.push({type:"gap",x,t:TENSES[x[4]],opts:shuffle([x[2],...x[3]])});
+  }
+  quiz=shuffle(qs); qi=0; score=0; wrongs=[];
+  if(!quiz.length){ $("#quiz-area").innerHTML=`<div class="empty">Nessuna domanda per questo filtro.</div>`; return; }
+  showQ();
+}
+function optLabel(q,o){ return q.type==="gap"?esc(o):esc(o.name); }
+function isRight(q,o){ return q.type==="gap"?o===q.x[2]:o.id===q.t.id; }
+function showQ(){
+  const q=quiz[qi]; let prompt="";
+  if(q.type==="gap"){
+    const [s,base]=q.x;
+    prompt=`<div class="ask">Completa la frase</div><div class="prompt sent">${esc(s).replace("___",`<span class="blank">&nbsp;?&nbsp;</span> <span class="base">(${esc(base)})</span>`)}</div>`;
+  } else if(q.type==="which"){
+    prompt=`<div class="ask">Che tempo è quello evidenziato?</div><div class="prompt sent" style="--c:${q.t.c}">${mark(q.u.en)}</div>`;
+  } else {
+    prompt=`<div class="ask">Che tempo usi per…</div><div class="prompt">${esc(q.u.desc)}</div>`;
+  }
+  $("#quiz-area").innerHTML=`
+    <div class="meta"><span>Domanda ${qi+1} di ${quiz.length}</span><span>Punti: <b>${score}</b></span></div>
+    <div class="qbar"><i style="width:${qi/quiz.length*100}%"></i></div>
+    <div class="q">${prompt}
+      <div class="opts">${q.opts.map((o,i)=>`<button class="opt" data-i="${i}">${optLabel(q,o)}</button>`).join("")}</div>
+      <div class="feedback" id="fb"></div></div>
+    <button class="primary" id="nextq" style="margin-top:12px;display:none">${qi+1<quiz.length?"Avanti":"Vedi risultato"}</button>`;
+}
+$("#quiz-area").addEventListener("click",e=>{
+  const o=e.target.closest(".opt");
+  if(o&&!o.disabled){
+    const q=quiz[qi], pick=q.opts[+o.dataset.i], ok=isRight(q,pick);
+    document.querySelectorAll(".opt").forEach((b,i)=>{ b.disabled=true; if(isRight(q,q.opts[i])) b.classList.add("right"); });
+    if(!ok){ o.classList.add("wrong"); wrongs.push(q); } else score++;
+    if(q.u) setBox(q.u, ok?box(q.u)+1:0); else bumpTense(q.t.id, ok);
+    let expl, full;
+    if(q.type==="gap"){ full=q.x[0].replace("___",q.x[2]); expl=`<b>${esc(q.t.name)}</b><br><span style="color:var(--muted)">${esc(full)}</span>`; }
+    else { full=plain(q.u.en); expl=`<b>${esc(q.t.name)}</b>: ${esc(q.u.desc)}<br><span style="color:var(--muted)">${mark(q.u.en)} — <i>${esc(q.u.itex)}</i></span>`; }
+    const fb=$("#fb"); fb.classList.add("show"); fb.style.setProperty("--c",q.t.c);
+    fb.innerHTML=(ok?"✅ Giusto! ":"❌ ")+expl+(q.t.warn&&!ok?`<div class="warn"><span class="lbl">Occhio</span>${q.t.warn}</div>`:"");
+    speak(full);
+    $("#nextq").style.display="block"; return;
+  }
+  if(e.target.closest("#nextq")){ qi++; qi<quiz.length?showQ():quizDone(); return; }
+  if(e.target.closest("#qagain")) startQuiz();
+});
+function quizDone(){
+  const pct=Math.round(score/quiz.length*100);
+  const msg=pct===100?"Perfetto!":pct>=70?"Ottimo lavoro!":pct>=40?"Ci sei quasi.":"Ripassa la sezione Impara e riprova.";
+  $("#quiz-area").innerHTML=`<div class="done"><div class="big">${score}/${quiz.length}</div><p>${msg}</p>
+    ${wrongs.length?`<div class="review"><div class="sub">Da ripassare (tornano per primi nelle Flashcard):</div>`+
+      wrongs.map(q=>`<div class="rcard" style="--c:${q.t.c}"><b style="color:${q.t.c}">${esc(q.t.name)}</b><br>`+
+        (q.type==="gap"?esc(q.x[0].replace("___",q.x[2])):`${esc(q.u.desc)}<br><span class="sub">${mark(q.u.en)}</span>`)+`</div>`).join("")+`</div>`:""}
+    <button class="primary" id="qagain" style="margin-top:16px">Nuovo quiz</button></div>`;
+}
+
+/* ================= NAVIGAZIONE ================= */
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
+  view=t.dataset.v;
+  document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x===t));
+  document.querySelectorAll(".view").forEach(s=>s.hidden=s.id!=="v-"+view);
+  if(view==="cards") startCards(); if(view==="quiz") startQuiz(); if(view==="learn") renderLearn();
+  window.scrollTo({top:0});
+}));
+renderChips(); renderProgress(); renderLearn();
+
+/* ================= PWA ================= */
+// scorciatoie dell'icona (tieni premuto): ?v=cards / ?v=quiz
+const startV=new URLSearchParams(location.search).get("v");
+if(startV){ const t=document.querySelector(`.tab[data-v="${startV}"]`); if(t) t.click(); }
+$("#reset").addEventListener("click",()=>{
+  if(!confirm("Vuoi davvero azzerare tutti i progressi?")) return;
+  prog={}; save(); renderProgress(); renderLearn();
+});
+
+// Service worker: offline + aggiornamenti
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>{
+    navigator.serviceWorker.register("sw.js").then(reg=>{
+      reg.addEventListener("updatefound",()=>{
+        const nw=reg.installing;
+        nw && nw.addEventListener("statechange",()=>{
+          if(nw.state==="installed" && navigator.serviceWorker.controller) showToast();
+        });
+      });
+    }).catch(()=>{});
+    let reloading=false;
+    navigator.serviceWorker.addEventListener("controllerchange",()=>{ if(reloading) return; reloading=true; location.reload(); });
+  });
+}
+function showToast(){
+  const t=document.createElement("div"); t.className="toast show";
+  t.innerHTML=`<span>Nuova versione disponibile</span><button>Aggiorna</button>`;
+  t.querySelector("button").onclick=()=>navigator.serviceWorker.getRegistration().then(r=>r&&r.waiting&&r.waiting.postMessage("skipWaiting"));
+  document.body.appendChild(t);
+}
+
+// Pulsante "Installa"
+const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+let deferred=null;
+const btn=$("#install");
+window.addEventListener("beforeinstallprompt",e=>{ e.preventDefault(); deferred=e; if(!standalone) btn.classList.add("show"); });
+window.addEventListener("appinstalled",()=>{ btn.classList.remove("show"); deferred=null; });
+if(isIOS && !standalone) btn.classList.add("show");
+btn.addEventListener("click",async()=>{
+  if(deferred){ deferred.prompt(); await deferred.userChoice; deferred=null; btn.classList.remove("show"); return; }
+  const s=document.createElement("div"); s.className="sheet show";
+  s.innerHTML=`<div class="in"><h3>Aggiungi alla schermata Home</h3><ol>
+    <li>Tocca <b>Condividi</b> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px"><path d="M12 3v13M7 8l5-5 5 5M5 12v8h14v-8"/></svg> nella barra di Safari</li>
+    <li>Scegli <b>Aggiungi alla schermata Home</b></li><li>Tocca <b>Aggiungi</b></li></ol>
+    <button class="primary">Ho capito</button></div>`;
+  s.addEventListener("click",ev=>{ if(ev.target===s||ev.target.closest("button")) s.remove(); });
+  document.body.appendChild(s);
+});
+</script>
+</body>
+</html>
