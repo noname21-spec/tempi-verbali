@@ -1,20 +1,20 @@
 /* Service worker di Tempi Verbali: tutta l'app in cache, funziona offline.
    Per pubblicare una nuova versione basta cambiare VERSION. */
-const VERSION = "tv-v1";
+const VERSION = "tv-v3";
 const ASSETS = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
-  "./icons/icon-192.png",
-  "./icons/icon-512.png",
-  "./icons/maskable-512.png",
-  "./icons/apple-touch-icon.png",
-  "./icons/favicon.png",
-  "./fonts/Inter-Regular.woff2",
-  "./fonts/Inter-Medium.woff2",
-  "./fonts/Inter-SemiBold.woff2",
-  "./fonts/Poppins-Medium.woff2",
-  "./fonts/Poppins-Bold.woff2"
+  "./icon-192.png",
+  "./icon-512.png",
+  "./maskable-512.png",
+  "./apple-touch-icon.png",
+  "./favicon.png",
+  "./Inter-Regular.woff2",
+  "./Inter-Medium.woff2",
+  "./Inter-SemiBold.woff2",
+  "./Poppins-Medium.woff2",
+  "./Poppins-Bold.woff2"
 ];
 
 self.addEventListener("install", e => {
